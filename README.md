@@ -20,7 +20,7 @@ Install the required Python packages using the following command:
 # Usage
 To use the script, run the following command:
 
-python3 backtestbcd.py -n <num_pairs> -r "<command>" --timerange "<timerange>"
+python3 backtest.py -n <num_pairs> -r "<command>" --timerange "<timerange>"
 
 where:
 
@@ -32,6 +32,6 @@ where:
 
 For example:
 
-- python3 backtestbcd.py -n 10 -r "freqtrade backtesting --strategy my_strategy -c config_test.json --cache none --export signals --timeframe 5m
+- python3 backtest.py -n 10 -r "freqtrade backtesting --strategy my_strategy -c config_test.json --cache none --export signals --timeframe 5m
 
 This will run backtests for the pairs specified in the config.json file, with 10 pairs in each backtest command, using the my_strategy strategy and a 5-minute timeframe on the default time ranges that cover: Downtrend, Uptrend, Sidetrend, all together. The output of the backtests will be saved to a file called backtest_output.txt
