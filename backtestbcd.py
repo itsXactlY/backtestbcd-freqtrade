@@ -7,7 +7,6 @@ import time
 from datetime import datetime, timedelta
 
 
-
 def split_into_chunks(lst, chunk_size):
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
