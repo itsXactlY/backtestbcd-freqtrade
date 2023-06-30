@@ -15,8 +15,6 @@ Clone or download the repository into your Freqtrade installation.
 
 Install the Freqtrade trading bot according to the instructions.
 
-Install the required Python packages using the following command:
-
 # Usage
 To use the script, run the following command:
 
