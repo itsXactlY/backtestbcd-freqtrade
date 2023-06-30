@@ -3,11 +3,10 @@ import os
 import glob
 import argparse
 import subprocess
-import logging
 import time
 from datetime import datetime, timedelta
 
-logger = logging.getLogger(__name__)
+
 
 def split_into_chunks(lst, chunk_size):
     for i in range(0, len(lst), chunk_size):
@@ -16,7 +15,7 @@ def split_into_chunks(lst, chunk_size):
 def get_config_filename(timerange_start):
     month_before = timerange_start - timedelta(days=30)
     formatted_date = month_before.strftime("%Y%m%d")
-    return f"C:\\Projects\\freqtrade\\user_data\\pairlists\\binance_spot\\USDT\\daily\\daily_200_USDT_0,01_minprice_{formatted_date}.json" # windows folder formating
+    return f"user_data\\pairlists\\binance_spot\\USDT\\daily\\daily_200_USDT_0,01_minprice_{formatted_date}.json" # windows folder formating
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Support backtest num_pair/total_pair once, different timeranges and output !')
@@ -26,7 +25,7 @@ parser.add_argument('-tr', '--timerange', type=str, default="20210509-20210524 2
 
 args = parser.parse_args()
 
-start_time = time.time()
+start_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 try:
     if args.command is not None:
@@ -75,7 +74,7 @@ try:
         file_names[-1] = file_names[-1].replace(" &&", "")
 
         # Open the output file for writing
-        with open("backtest_output.txt", "w") as f:
+        with open(f"backtest_output_{start_time}.txt", "w") as f:
             f.write(f"\nPrint output: {num_backtest} results\n")
             for name in file_names:
                 f.write(f"Running command: {name}\n")
