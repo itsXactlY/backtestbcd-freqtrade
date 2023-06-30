@@ -24,7 +24,7 @@ parser.add_argument('-tr', '--timerange', type=str, default="20210509-20210524 2
 
 args = parser.parse_args()
 
-start_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+start_time = datetime.now()
 
 try:
     if args.command is not None:
@@ -73,20 +73,21 @@ try:
         file_names[-1] = file_names[-1].replace(" &&", "")
 
         # Open the output file for writing
-        with open(f"backtest_output_{start_time}.txt", "w") as f:
+        with open(f"backtest_output_{start_time.strftime('%Y-%m-%d_%H-%M').replace(':', '_')}.txt", "w") as f:
             f.write(f"\nPrint output: {num_backtest} results\n")
             for name in file_names:
                 f.write(f"Running command: {name}\n")
                 # Redirect the output of the command to the file
                 subprocess.run(name, shell=True, stdout=f, stderr=f)
 
-        end_time = time.time()
+        end_time = datetime.now()
 
-        total_time = end_time - start_time
-        total_minutes = int(total_time // 60)
-        total_seconds = int(total_time % 60)
+        elapsed_time = end_time - start_time
+        total_seconds = int(elapsed_time.total_seconds())
+        total_minutes = int(total_seconds // 60)  # Fix typo here
+        total_seconds = int(total_seconds % 60)  # Use total_seconds instead of total_time
 
-        print(f"\n---> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_time:.2f} seconds)")
+        print(f"\n---> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
         
     else:
         print('Error. Example usage: python3 backtestbcd.py -n 5 -r "freqtrade backtesting --strategy-list teststra -c config_test.json --cache none --export signals --timeframe 1m --max-open-trades 1 --enable-protections" --timerange "20230310-20230311 20230201-20230202 20220610-20220611 20230102-20230104 20230104-"')
