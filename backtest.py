@@ -7,6 +7,7 @@ import time
 from datetime import datetime, timedelta
 import platform
 from calendar import monthrange
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def split_into_chunks(lst, chunk_size):
@@ -35,9 +36,8 @@ def get_config_filename(timerange_start):
         return f"user_data/pairlists/binance_spot/USDT/daily/daily_200_USDT_0,01_minprice_{formatted_date}.json"  # Unix-like folder formatting
 
 
-
 # Parse command line arguments
-parser = argparse.ArgumentParser(description='Support backtest num_pair/total_pair once, different timeranges and output !')
+parser = argparse.ArgumentParser(description='Support backtest num_pair/total_pair once, different timeranges and output!')
 parser.add_argument('-n', '--num_pairs', type=int, default='-1', help='Number of pairs in each command')
 parser.add_argument('-r', '--command', type=str, default='freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m', help='Send the highly trained Apes...')
 parser.add_argument('-timerange', '--timerange', type=str, default="20210101-20230101", help=' Define Timerange, example: --timerange 20230101-20230201')
@@ -111,13 +111,13 @@ try:
 
         elapsed_time = end_time - start_time
         total_seconds = int(elapsed_time.total_seconds())
-        total_minutes = int(total_seconds // 60)  # Fix typo here
-        total_seconds = int(total_seconds % 60)  # Use total_seconds instead of total_time
+        total_minutes = int(total_seconds // 60)
+        total_seconds = int(total_seconds % 60)
 
         print(f"\n---> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
         
     else:
-        print('Error. Example usage: python3 backtest.py -n 300  -r "freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
+        print('Error. Example usage: python3 backtest.py -n 300 -r "freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
 
 except Exception as e:
     print(f"Error: {e}")
