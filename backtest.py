@@ -8,7 +8,11 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 
+
+MAX_PARALLEL_RUNS = 12  
+pairlist_cache = {}
 start_time = datetime.now()
+processes = []
 
 
 def split_into_chunks(lst, chunk_size):
@@ -39,7 +43,12 @@ def get_config_filename(timerange_start, timerange_end):
 
     try:
         with open(filename) as f:
-            return filename
+            if filename in pairlist_cache:
+                return pairlist_cache[filename]
+            with open(filename) as f:
+                pairlist_cache[filename] = f
+                return f
+
     except FileNotFoundError:
         print(f"Warning: File '{filename}' not found. Using pairlist config from previous month instead.")
         return get_config_filename(timerange_start, month_before_date)
@@ -71,7 +80,7 @@ if __name__ == '__main__':
         num_months = (timerange_end.year - timerange_start.year) * 12 + (timerange_end.month - timerange_start.month) + 1
 
         commands = []
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=MAX_PARALLEL_RUNS) as executor:
             for i in range(num_months):
                 month_start = timerange_start + timedelta(days=i * 30)
                 month_end = month_start + timedelta(days=30)
@@ -90,7 +99,7 @@ if __name__ == '__main__':
                     num_pair_one = args.num_pairs
                     pair_test = list(split_into_chunks(pair_whitelist, num_pair_one))
                     num_backtest = len(pair_test) * num_months
-                    print(f"--> OK! Let's run {num_backtest} backtests, please wait....")
+                    print(f"--> OK! Let's run {num_backtest} backtests, splitting them into {num_backtest} chunks to run them in parallel, please wait....")
 
                     for pairs in pair_test:
                         formatted_pairs = ' '.join(pairs)
