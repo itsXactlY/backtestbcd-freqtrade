@@ -71,8 +71,7 @@ try:
             month_end_str = month_end.strftime("%Y%m%d")
 
             # config_filename = get_config_filename(month_start)
-            config_filename = get_config_filename(month_start, month_end)
-            
+            config_filename = get_config_filename(month_start, month_end)            
             with open(config_filename) as f:
                         filtered_lines = [line for line in f if not line.strip().startswith("//")]
                         filtered_content = ''.join(filtered_lines)
@@ -122,7 +121,7 @@ try:
         total_minutes = int(total_seconds // 60)
         total_seconds = int(total_seconds % 60)
 
-        print(f"\n---> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
+        print(f"\n-> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
 
     else:
         print('Error. Example usage: python3 backtest.py -n 300 -r "freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
