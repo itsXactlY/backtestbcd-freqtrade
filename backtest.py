@@ -1,20 +1,30 @@
+import argparse
+import glob
 import json
 import os
-import glob
-import argparse
-import subprocess
-from datetime import datetime, timedelta
 import platform
+import subprocess
 from calendar import monthrange
+from datetime import datetime, timedelta
 
+
+start_time = datetime.now()
+
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Support backtest num_pair/total_pair once, different timeranges and output!')
+parser.add_argument('-n', '--num_pairs', type=int, default='-1', help='Number of pairs in each command')
+parser.add_argument('-r', '--command', type=str, default='freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m', help='Ask the highly trained Apes...')
+parser.add_argument('-timerange', '--timerange', type=str, default="20210101-20230101", help=' Define Timerange, example: --timerange 20230101-20230201')
+
+args = parser.parse_args()
 
 def split_into_chunks(lst, chunk_size):
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
-def get_config_filename(month_start):
-    year = month_start.year
-    month = month_start.month
+def get_config_filename(timerange_start, timerange_end):
+    year = timerange_end.year
+    month = timerange_end.month
 
     # Calculate the month before
     if month == 1:
@@ -29,20 +39,17 @@ def get_config_filename(month_start):
     formatted_date = month_before_date.strftime("%Y%m%d")
 
     if platform.system() == "Windows":
-        return f"user_data\\pairlists\\binance_spot\\USDT\\daily\\daily_200_USDT_0,01_minprice_{formatted_date}.json"  # Windows folder formatting
+        filename = f"user_data\\pairlists\\binance_spot\\USDT\\daily\\daily_200_USDT_0,01_minprice_{formatted_date}.json"
     else:
-        return f"user_data/pairlists/binance_spot/USDT/daily/daily_200_USDT_0,01_minprice_{formatted_date}.json"  # Unix-like folder formatting
+        filename = f"user_data/pairlists/binance_spot/USDT/daily/daily_200_USDT_0,01_minprice_{formatted_date}.json"
 
+    try:
+        with open(filename) as f:
+            return filename
+    except FileNotFoundError:
+        print(f"Warning: File '{filename}' not found. Using pairlist config from previous month instead.")
+        return get_config_filename(timerange_start, month_before_date)
 
-# Parse command line arguments
-parser = argparse.ArgumentParser(description='Support backtest num_pair/total_pair once, different timeranges and output!')
-parser.add_argument('-n', '--num_pairs', type=int, default='-1', help='Number of pairs in each command')
-parser.add_argument('-r', '--command', type=str, default='freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m', help='Send the highly trained Apes...')
-parser.add_argument('-timerange', '--timerange', type=str, default="20210101-20230101", help=' Define Timerange, example: --timerange 20230101-20230201')
-
-args = parser.parse_args()
-
-start_time = datetime.now()
 
 try:
     if args.command is not None:
@@ -63,8 +70,9 @@ try:
             month_start_str = month_start.strftime("%Y%m%d")
             month_end_str = month_end.strftime("%Y%m%d")
 
-            config_filename = get_config_filename(month_start)
-
+            # config_filename = get_config_filename(month_start)
+            config_filename = get_config_filename(month_start, month_end)
+            
             with open(config_filename) as f:
                         filtered_lines = [line for line in f if not line.strip().startswith("//")]
                         filtered_content = ''.join(filtered_lines)
@@ -76,14 +84,16 @@ try:
                 pair_test = list(split_into_chunks(pair_whitelist, num_pair_one))
                 num_backtest = len(pair_test) * num_months
                 print(f"--> OK! Let's run {num_backtest} backtests, please wait....")
+                
                 for pairs in pair_test:
                     formatted_pairs = ' '.join(pairs)
                     cmd = f"{command} --timerange {month_start_str}-{month_end_str} -p {formatted_pairs} -c {config_filename}"
                     print(f"Running command: {cmd}")
                     subprocess.run(cmd, shell=True)
+
             else:
                 num_backtest = num_months
-                cmd = f"{command} --timerange {month_start_str}-{month_end_str} -c {config_filename}"
+                cmd = f"{command} --timerange {month_start_str}-{month_end_str} -p {formatted_pairs} -c {config_filename}"
                 print(f"Running command: {cmd}")
                 subprocess.run(cmd, shell=True)
 
