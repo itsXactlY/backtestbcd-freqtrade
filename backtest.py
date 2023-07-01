@@ -3,20 +3,18 @@ import os
 import glob
 import argparse
 import subprocess
-import time
 from datetime import datetime, timedelta
 import platform
 from calendar import monthrange
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 def split_into_chunks(lst, chunk_size):
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
-def get_config_filename(timerange_start):
-    year = timerange_start.year
-    month = timerange_start.month
+def get_config_filename(month_start):
+    year = month_start.year
+    month = month_start.month
 
     # Calculate the month before
     if month == 1:
@@ -68,10 +66,10 @@ try:
             config_filename = get_config_filename(month_start)
 
             with open(config_filename) as f:
-                filtered_lines = [line for line in f if not line.strip().startswith("//")]
-                filtered_content = ''.join(filtered_lines)
-                data = json.loads(filtered_content)
-
+                        filtered_lines = [line for line in f if not line.strip().startswith("//")]
+                        filtered_content = ''.join(filtered_lines)
+                        data = json.loads(filtered_content)
+            
             pair_whitelist = data['exchange']['pair_whitelist']
             if args.num_pairs is not None and args.num_pairs > 0:
                 num_pair_one = args.num_pairs
@@ -80,12 +78,12 @@ try:
                 print(f"--> OK! Let's run {num_backtest} backtests, please wait....")
                 for pairs in pair_test:
                     formatted_pairs = ' '.join(pairs)
-                    cmd = f"{command} --timerange {month_start_str}-{month_end_str} -p {formatted_pairs}"
+                    cmd = f"{command} --timerange {month_start_str}-{month_end_str} -p {formatted_pairs} -c {config_filename}"
                     print(f"Running command: {cmd}")
                     subprocess.run(cmd, shell=True)
             else:
                 num_backtest = num_months
-                cmd = f"{command} --timerange {month_start_str}-{month_end_str}"
+                cmd = f"{command} --timerange {month_start_str}-{month_end_str} -c {config_filename}"
                 print(f"Running command: {cmd}")
                 subprocess.run(cmd, shell=True)
 
@@ -115,7 +113,7 @@ try:
         total_seconds = int(total_seconds % 60)
 
         print(f"\n---> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
-        
+
     else:
         print('Error. Example usage: python3 backtest.py -n 300 -r "freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
 
