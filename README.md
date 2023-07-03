@@ -30,9 +30,9 @@ where:
 
 For example:
 
-- python3 backtest.py -n 10 -r "freqtrade backtesting --strategy my_strategy -c config_test.json --cache none --export signals --timeframe 5m
+- python3 backtest.py -n 10 -r "freqtrade backtesting --strategy my_strategy -c your-config.json --cache none --export signals --timeframe 5m --timerange 20210425-20210610
 
-This will run backtests for the pairs specified in the config.json file, with 10 pairs in each backtest command, using the my_strategy strategy and a 5-minute timeframe on the default time ranges that cover: Downtrend, Uptrend, Sidetrend, and finally all together. The output of the backtests will be saved to a file called backtest_output.txt
+This will run backtests for the first/best 10 pairs specified in the pairlist/exchange/spot/collateral/file from the month before we start backtesting, with (MAX_PARALLEL_RUNS = xx), using the my_strategy strategy and a 5-minute timeframe. The output of the backtests will be saved to a file called backtest_output-YYYYMMDD-[...].txt
 
 # Notes
 
