@@ -115,7 +115,7 @@ if __name__ == '__main__':
             results = executor.map(run_backtest, commands)
 
         directory = "user_data/plot_bulk/"
-        extension = ".json"
+        extension = ".html"
         file_list = glob.glob(os.path.join(directory, f"*{extension}"))
         file_list.sort(key=os.path.getmtime, reverse=True)
         filtered_files = [file for file in file_list if "meta" not in os.path.basename(file)]
