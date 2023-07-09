@@ -164,7 +164,6 @@ if __name__ == '__main__':
         total_seconds = int(total_seconds % 60)
 
         # Perform plotting if specified
-        # Perform plotting if specified
         if args.plot is not None and "-p" in command:
             plot_command = "freqtrade plot-dataframe --strategy aio2 -c config_test.json --timeframe 1m"
 
@@ -190,4 +189,4 @@ if __name__ == '__main__':
         print(f"\n-> Total time taken: {total_minutes} minutes and {total_seconds} seconds ({total_seconds:.2f} seconds)")
 
     else:
-        print('Error. Example usage: python3 backtest.py -n 300 -r "freqtrade backtesting --strategy aio -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
+        print('Error. Example usage: python3 backtest.py -n 200 -r "freqtrade backtesting --strategy StrategyClassName -c config_test.json --cache none --export signals --timeframe 5m" --timerange 20210101-20230101"')
